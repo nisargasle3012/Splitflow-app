@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import userRoutes from "./modules/users/user.routes.js";
 import groupRoutes from "./modules/groups/group.routes.js";
+import expenseRoutes from "./modules/expenses/expense.routes.js";
 
 dotenv.config();
 const app = express();
@@ -17,8 +18,11 @@ connectDB();
 // Health check
 app.get("/", (req, res) => res.send("API is running"));
 
+//ROUTES
 app.use("/api/users", userRoutes);
 app.use("/api/groups", groupRoutes);
+app.use("/api/expenses", expenseRoutes);
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
