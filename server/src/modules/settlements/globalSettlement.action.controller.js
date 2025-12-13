@@ -1,6 +1,8 @@
 import GlobalSettlement from "./globalSettlement.model.js";
 import LedgerEntry from "../expenses/ledger.model.js";
 import Group from "../groups/group.model.js";
+import Activity from "../activity/activity.model.js";
+
 
 export const acceptGlobalSettlement = async (req, res) => {
   try {
@@ -35,6 +37,18 @@ export const acceptGlobalSettlement = async (req, res) => {
     settlement.resolvedAt = new Date();
     await settlement.save();
 
+    await Activity.create({
+        groupId: settlement.groupId,
+        actorUser: userId,
+        type: "SETTLEMENT_ACCEPTED",
+        metadata: {
+            amount: settlement.amount,
+            fromUser: settlement.fromUser,
+            toUser: settlement.toUser
+        }
+        });
+
+
     return res.json({
       message: "Settlement accepted",
       settlement
@@ -68,6 +82,18 @@ export const rejectGlobalSettlement = async (req, res) => {
     settlement.status = "REJECTED";
     settlement.resolvedAt = new Date();
     await settlement.save();
+
+    await Activity.create({
+        groupId: settlement.groupId,
+        actorUser: userId,
+        type: "SETTLEMENT_REJECTED",
+        metadata: {
+            amount: settlement.amount,
+            fromUser: settlement.fromUser,
+            toUser: settlement.toUser
+        }
+        });
+
 
     return res.json({
       message: "Settlement rejected",

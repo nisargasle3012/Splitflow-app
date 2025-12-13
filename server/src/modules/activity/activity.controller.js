@@ -1,18 +1,29 @@
-import User from "../users/user.model.js";
+import Activity from "./activity.model.js";
+import Group from "../groups/group.model.js";
 
-export const getme = async (req, res) => {
+export const getGroupActivity = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { groupId } = req.params;
 
-    const user = await User.findById(userId).select("name email"); 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
 
-    return res.status(200).json({
-      userId,
-      name: user.name,
-      email: user.email,
-    });
+    if (!group.members.includes(userId)) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const activities = await Activity.find({ groupId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate("actorUser", "name");
+
+    res.json({ activities });
+
   } catch (error) {
-    return res.status(500).json({ message: "Server error" });
+    console.error("Get Group Activity Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

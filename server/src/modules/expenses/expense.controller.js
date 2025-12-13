@@ -1,6 +1,7 @@
 import Expense from "./expense.model.js";
 import Group from "../groups/group.model.js";
 import { createLedgerEntries } from "./ledger.utils.js";
+import Activity from "../activity/activity.model.js";
 
 export const addExpense = async (req, res) => {
   try {
@@ -27,6 +28,17 @@ export const addExpense = async (req, res) => {
     });
 
     await createLedgerEntries(expense);
+
+    await Activity.create({
+      groupId,
+      actorUser: payerId,
+      type: "EXPENSE_ADDED",
+      metadata: {
+        amount,
+        description
+      }
+    });
+
 
     return res.status(201).json({
       message: "Expense added successfully",

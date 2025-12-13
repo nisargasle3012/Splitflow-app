@@ -12,7 +12,7 @@ import globalBalanceRoutes from "./modules/balances/globalBalance.routes.js";
 import globalSettlementRoutes from "./modules/settlements/globalSettlement.routes.js";
 import globalSettlementFetchRoutes from "./modules/settlements/globalSettlement.fetch.routes.js";
 import globalSettlementActionRoutes from "./modules/settlements/globalSettlement.action.routes.js";
-
+import globalActivityRoutes from "./modules/activity/globalActivity.routes.js";
 
 dotenv.config();
 const app = express();
@@ -31,12 +31,13 @@ app.use("/api/users", userRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/balances", balanceRoutes);
-app.use("/api/activities", activityRoutes);
+app.use("/api/activity", activityRoutes);
 app.use("/api/settlements", settlementRoutes);
 app.use("/api/globalBalances", globalBalanceRoutes);
 app.use("/api/globalSettlements", globalSettlementRoutes);
 app.use("/api/globalSettlementsFetch", globalSettlementFetchRoutes);
 app.use("/api/globalSettlementsAction", globalSettlementActionRoutes);
+app.use("/api/globalActivity", globalActivityRoutes);
 
 
 // Start server

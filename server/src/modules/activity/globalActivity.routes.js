@@ -1,9 +1,9 @@
 import express from "express";
 import { auth } from "../../middleware/auth.js";
-import { getGroupActivity } from "./activity.controller.js";
+import { getGlobalActivity } from "./globalActivity.controller.js";
 
 const router = express.Router();
 
-router.get("/:groupId", auth, getGroupActivity);
+router.get("/global", auth, getGlobalActivity);
 
 export default router;
