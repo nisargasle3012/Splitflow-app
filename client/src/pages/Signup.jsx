@@ -1,55 +1,68 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { registerApi } from "../api/auth.api";
+import { useAuth } from "../context/AuthContext";
 
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+function Signup() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-        email,
-        password
-      });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('userId', res.data.user._id);
-      setMessage(res.data.message);
-      navigate('/home');
+      const res = await registerApi({ name, email, password });
+
+      // 🔥 Cookie already set by backend
+      setUser(res.data.user);
+
+      navigate("/");
     } catch (err) {
-      setMessage(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.message || "Signup failed");
     }
   };
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
-      <form autoComplete="off" onSubmit={e => e.preventDefault()} className="auth-form">
-        <input type="text" name="fakeuser" style={{ display: 'none' }} />
-        <input type="password" name="fakepass" style={{ display: 'none' }} />
+      <h2>Signup</h2>
+
+      <form onSubmit={(e) => e.preventDefault()} className="auth-form">
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
+
         <input
           type="password"
           placeholder="Password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="button" onClick={handleLogin}>Login</button>
+
+        <button type="button" onClick={handleSignup}>
+          Signup
+        </button>
       </form>
 
-      <p className="message">{message}</p>
-      <Link to="/signup" className="link">Don't have an account? Signup</Link>
+      {error && <p className="error">{error}</p>}
+
+      <Link to="/login" className="link">
+        Already have an account? Login
+      </Link>
     </div>
   );
 }
 
-export default Login;
+export default Signup;

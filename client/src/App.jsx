@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./auth/AuthContext";
-import ProtectedRoute from "./auth/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -16,8 +16,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public */}
-          <Route path="/users/login" element={<Login />} />
-          <Route path="/users/signup" element={<Signup />} />
+          <Route path="users/login" element={<Login />} />
+          <Route path="users/signup" element={<Signup />} />
 
           {/* Protected */}
           <Route
