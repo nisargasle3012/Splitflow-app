@@ -1,56 +1,24 @@
+// api/client.js
 import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:5000",
-  withCredentials: true
+  withCredentials: true,
 });
 
-let accessToken = null;
+let isLoggingOut = false;
 
-export const setAccessToken = (token) => {
-  accessToken = token;
-};
-
-export const clearAccessToken = () => {
-  accessToken = null;
-};
-
-// Attach access token
-api.interceptors.request.use((config) => {
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-  return config;
-});
-
-// Refresh logic
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (
-      !error.response ||
-      error.response.status !== 401 ||
-      originalRequest._retry ||
-      originalRequest.url.includes("/auth/refresh")
-    ) {
-      return Promise.reject(error);
+  (error) => {
+    if (error.response?.status === 401 && !isLoggingOut) {
+      isLoggingOut = true;
+
+      // hard reset auth state
+      window.location.href = "/users/login";
     }
 
-    originalRequest._retry = true;
-
-    try {
-      const res = await api.post("/auth/refresh");
-      setAccessToken(res.data.accessToken);
-
-      originalRequest.headers.Authorization =
-        `Bearer ${res.data.accessToken}`;
-
-      return api(originalRequest);
-    } catch (refreshError) {
-      clearAccessToken();
-      return Promise.reject(refreshError);
-    }
+    return Promise.reject(error);
   }
 );
 
